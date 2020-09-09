@@ -18,10 +18,13 @@
 package net.bible.android.control.page
 
 import android.util.Log
+import android.webkit.JavascriptInterface
+import net.bible.android.control.mynote.MyNoteControl
 import net.bible.android.control.mynote.MyNoteDAO
 import net.bible.android.control.versification.BibleTraverser
 import net.bible.android.control.versification.ConvertibleVerseRange
 import net.bible.service.download.FakeSwordBookFactory
+import net.bible.service.format.HtmlMessageFormatter
 import net.bible.service.sword.SwordContentFacade
 import net.bible.service.sword.SwordDocumentFacade
 import org.crosswire.jsword.book.Book
@@ -38,11 +41,12 @@ import java.io.IOException
  * @author Martin Denham [mjdenham at gmail dot com]
  */
 class CurrentMyNotePage internal constructor(
-	currentVerse: CurrentBibleVerse,
-	bibleTraverser: BibleTraverser,
-	swordContentFacade: SwordContentFacade,
-	swordDocumentFacade: SwordDocumentFacade,
-	private val myNoteDAO: MyNoteDAO,
+    currentVerse: CurrentBibleVerse,
+    bibleTraverser: BibleTraverser,
+    swordContentFacade: SwordContentFacade,
+    swordDocumentFacade: SwordDocumentFacade,
+    private val myNoteDAO: MyNoteDAO,
+    private val myNoteControl: MyNoteControl,
     pageManager: CurrentPageManager
 ) : CurrentCommentaryPage(currentVerse, bibleTraverser, swordContentFacade, swordDocumentFacade, pageManager), CurrentPage
 {
@@ -50,7 +54,12 @@ class CurrentMyNotePage internal constructor(
     // just one fake book for every note
     private var fakeMyNoteBook: Book? = null
     private var fakeMyNoteBookVersification: Versification? = null
-    override val currentPageContent: String get() = myNoteDAO.getMyNoteTextByKey(key)
+    override val currentPageContent: String get() {
+        var text: String = myNoteDAO.getMyNoteTextByKey(key)
+        text = "<div id=\"editor\" contentEditable=\"true\">$text</div>"
+        text = HtmlMessageFormatter.format(text)
+        return text
+    }
 
     override val currentDocument: Book
 		get () {
@@ -122,6 +131,11 @@ class CurrentMyNotePage internal constructor(
 		_key = key
         doSetKey(key)
 	}
+
+    @JavascriptInterface
+    override fun save(text: String) {
+        myNoteControl.saveMyNoteText(text)
+    }
 
     override val numberOfVersesDisplayed: Int
         get() = if (currentNoteVerseRange != null) currentNoteVerseRange!!.verseRange.cardinality else 1

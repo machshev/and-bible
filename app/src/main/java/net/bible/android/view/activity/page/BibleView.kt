@@ -30,6 +30,7 @@ import android.webkit.JsResult
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.view.GestureDetectorCompat
 import net.bible.android.BibleApplication
 import net.bible.android.activity.R
@@ -56,6 +57,7 @@ import net.bible.android.view.activity.page.screen.WebViewsBuiltEvent
 import net.bible.android.view.util.UiUtils
 import net.bible.service.common.CommonUtils
 import net.bible.service.device.ScreenSettings
+import net.bible.service.format.HtmlMessageFormatter
 import org.crosswire.jsword.book.BookCategory
 import java.lang.ref.WeakReference
 
@@ -279,6 +281,8 @@ class BibleView(val mainBibleActivity: MainBibleActivity,
             finalHtml = finalHtml.replace("<div id='start'>", "<div id='start' style='height:${startPaddingHeight}px'>")
 
             val currentPage = window.pageManager.currentPage
+            this.settings.javaScriptEnabled = true
+            this.addJavascriptInterface(currentPage, "currentPage")
 
             var jumpToChapterVerse = chapterVerse
             var jumpToYOffsetRatio = yOffsetRatio

@@ -23,6 +23,7 @@ import android.util.Log
 
 import net.bible.android.SharedConstants
 import net.bible.android.control.PassageChangeMediator
+import net.bible.android.control.mynote.MyNoteControl
 import net.bible.android.control.mynote.MyNoteDAO
 import net.bible.android.control.page.window.Window
 import net.bible.android.control.page.window.WindowRepository
@@ -47,18 +48,19 @@ import javax.inject.Inject
  * @author Martin Denham [mjdenham at gmail dot com]
  */
 open class CurrentPageManager @Inject constructor(
-        swordContentFacade: SwordContentFacade,
-        swordDocumentFacade: SwordDocumentFacade,
-        bibleTraverser: BibleTraverser,
-        myNoteDAO: MyNoteDAO,
-        val windowRepository: WindowRepository
+    swordContentFacade: SwordContentFacade,
+    swordDocumentFacade: SwordDocumentFacade,
+    bibleTraverser: BibleTraverser,
+    myNoteDAO: MyNoteDAO,
+    myNoteControl: MyNoteControl,
+    val windowRepository: WindowRepository
         )
 {
     // use the same verse in the commentary and bible to keep them in sync
     private val currentBibleVerse: CurrentBibleVerse = CurrentBibleVerse()
     val currentBible = CurrentBiblePage(currentBibleVerse, bibleTraverser, swordContentFacade, swordDocumentFacade, this)
     val currentCommentary = CurrentCommentaryPage(currentBibleVerse, bibleTraverser, swordContentFacade, swordDocumentFacade, this)
-    val currentMyNotePage = CurrentMyNotePage(currentBibleVerse, bibleTraverser, swordContentFacade, swordDocumentFacade, myNoteDAO, this)
+    val currentMyNotePage = CurrentMyNotePage(currentBibleVerse, bibleTraverser, swordContentFacade, swordDocumentFacade, myNoteDAO, myNoteControl,this)
     val currentDictionary = CurrentDictionaryPage(swordContentFacade, swordDocumentFacade, this)
     val currentGeneralBook = CurrentGeneralBookPage(swordContentFacade, swordDocumentFacade, this)
     val currentMap = CurrentMapPage(swordContentFacade, swordDocumentFacade, this)
